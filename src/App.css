@@ -6,7 +6,9 @@ body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  background: #111827;
+  background:
+    radial-gradient(circle at top, rgba(248, 113, 113, 0.22), transparent 34%),
+    #111827;
   color: #f9fafb;
 }
 
@@ -24,22 +26,48 @@ button {
 
 .timer-card {
   width: 100%;
-  max-width: 420px;
-  padding: 36px 28px;
-  border-radius: 28px;
-  background: #1f2937;
+  max-width: 460px;
+  padding: 32px 28px;
+  border-radius: 30px;
+  background: rgba(31, 41, 55, 0.88);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 18px;
   color: #f87171;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 13px;
+}
+
+.mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 28px;
+  padding: 6px;
+  background: #111827;
+  border-radius: 999px;
+}
+
+.mode-tab {
+  border: none;
+  cursor: pointer;
+  padding: 10px 8px;
+  border-radius: 999px;
+  color: #9ca3af;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mode-tab.active {
+  background: #f87171;
+  color: #111827;
 }
 
 h1 {
@@ -61,7 +89,8 @@ h1 {
   justify-content: center;
 }
 
-button {
+.primary-button,
+.secondary-button {
   border: none;
   cursor: pointer;
   border-radius: 999px;
@@ -70,7 +99,9 @@ button {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-button:hover {
+.primary-button:hover,
+.secondary-button:hover,
+.mode-tab:hover {
   transform: translateY(-2px);
 }
 
@@ -82,4 +113,18 @@ button:hover {
 .secondary-button {
   background: #374151;
   color: #f9fafb;
+}
+
+@media (max-width: 420px) {
+  .timer-card {
+    padding: 28px 20px;
+  }
+
+  .mode-tab {
+    font-size: 12px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
 }

@@ -1,11 +1,30 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-const POMODORO_TIME = 25 * 60;
+const TIMER_MODES = {
+  work: {
+    label: "Work",
+    title: "Focus Session",
+    minutes: 25,
+  },
+  shortBreak: {
+    label: "Short Break",
+    title: "Quick Break",
+    minutes: 5,
+  },
+  longBreak: {
+    label: "Long Break",
+    title: "Deep Rest",
+    minutes: 15,
+  },
+};
 
 function App() {
-  const [timeLeft, setTimeLeft] = useState(POMODORO_TIME);
+  const [activeMode, setActiveMode] = useState("work");
+  const [timeLeft, setTimeLeft] = useState(TIMER_MODES.work.minutes * 60);
   const [isRunning, setIsRunning] = useState(false);
+
+  const currentMode = TIMER_MODES[activeMode];
 
   useEffect(() => {
     if (!isRunning) return;
@@ -33,13 +52,19 @@ function App() {
     ).padStart(2, "0")}`;
   };
 
+  const handleModeChange = (mode) => {
+    setActiveMode(mode);
+    setIsRunning(false);
+    setTimeLeft(TIMER_MODES[mode].minutes * 60);
+  };
+
   const handleStartPause = () => {
     setIsRunning((prev) => !prev);
   };
 
   const handleReset = () => {
     setIsRunning(false);
-    setTimeLeft(POMODORO_TIME);
+    setTimeLeft(currentMode.minutes * 60);
   };
 
   return (
@@ -47,13 +72,29 @@ function App() {
       <section className="timer-card">
         <p className="eyebrow">Pomodoro Timer</p>
 
-        <h1>Focus Session</h1>
+        <div className="mode-tabs">
+          {Object.entries(TIMER_MODES).map(([mode, data]) => (
+            <button
+              key={mode}
+              onClick={() => handleModeChange(mode)}
+              className={`mode-tab ${activeMode === mode ? "active" : ""}`}
+            >
+              {data.label}
+            </button>
+          ))}
+        </div>
+
+        <h1>{currentMode.title}</h1>
 
         <div className="timer-display">{formatTime(timeLeft)}</div>
 
         <div className="button-group">
           <button onClick={handleStartPause} className="primary-button">
-            {isRunning ? "Pause" : timeLeft === POMODORO_TIME ? "Start" : "Resume"}
+            {isRunning
+              ? "Pause"
+              : timeLeft === currentMode.minutes * 60
+              ? "Start"
+              : "Resume"}
           </button>
 
           <button onClick={handleReset} className="secondary-button">
