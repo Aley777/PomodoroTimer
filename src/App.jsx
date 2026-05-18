@@ -23,6 +23,7 @@ function App() {
   const [activeMode, setActiveMode] = useState("work");
   const [timeLeft, setTimeLeft] = useState(TIMER_MODES.work.minutes * 60);
   const [isRunning, setIsRunning] = useState(false);
+  const [completedSessions, setCompletedSessions] = useState(0);
 
   const currentMode = TIMER_MODES[activeMode];
 
@@ -33,6 +34,11 @@ function App() {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           setIsRunning(false);
+
+          if (activeMode === "work") {
+            setCompletedSessions((prevSessions) => prevSessions + 1);
+          }
+
           return 0;
         }
 
@@ -41,7 +47,7 @@ function App() {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [isRunning]);
+  }, [isRunning, activeMode]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -59,12 +65,20 @@ function App() {
   };
 
   const handleStartPause = () => {
+    if (timeLeft === 0) {
+      setTimeLeft(currentMode.minutes * 60);
+    }
+
     setIsRunning((prev) => !prev);
   };
 
   const handleReset = () => {
     setIsRunning(false);
     setTimeLeft(currentMode.minutes * 60);
+  };
+
+  const handleResetSessions = () => {
+    setCompletedSessions(0);
   };
 
   return (
@@ -99,6 +113,17 @@ function App() {
 
           <button onClick={handleReset} className="secondary-button">
             Reset
+          </button>
+        </div>
+
+        <div className="session-panel">
+          <div>
+            <span className="session-label">Completed Sessions</span>
+            <strong>{completedSessions}</strong>
+          </div>
+
+          <button onClick={handleResetSessions} className="ghost-button">
+            Clear
           </button>
         </div>
       </section>
