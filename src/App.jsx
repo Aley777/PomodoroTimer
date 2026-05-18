@@ -5,17 +5,17 @@ const TIMER_MODES = {
   work: {
     label: "Work",
     title: "Focus Session",
-    minutes: 25,
+    minutes: 0.1,
   },
   shortBreak: {
     label: "Short Break",
     title: "Quick Break",
-    minutes: 5,
+    minutes: 0.05,
   },
   longBreak: {
     label: "Long Break",
     title: "Deep Rest",
-    minutes: 15,
+    minutes: 0.05,
   },
 };
 
@@ -24,6 +24,9 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(TIMER_MODES.work.minutes * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [completedSessions, setCompletedSessions] = useState(0);
+  const [statusMessage, setStatusMessage] = useState(
+    "Ready to start your focus session."
+  );
 
   const sessionCountedRef = useRef(false);
 
@@ -49,10 +52,32 @@ function App() {
   }, [isRunning]);
 
   useEffect(() => {
-    if (timeLeft === 0 && activeMode === "work" && !sessionCountedRef.current) {
-      setCompletedSessions((prevSessions) => prevSessions + 1);
-      sessionCountedRef.current = true;
+    if (timeLeft !== 0 || sessionCountedRef.current) return;
+
+    sessionCountedRef.current = true;
+
+    if (activeMode === "work") {
+      setCompletedSessions((prevSessions) => {
+        const nextSessions = prevSessions + 1;
+        const nextMode = nextSessions % 4 === 0 ? "longBreak" : "shortBreak";
+
+        setActiveMode(nextMode);
+        setTimeLeft(TIMER_MODES[nextMode].minutes * 60);
+        setStatusMessage(
+          nextMode === "longBreak"
+            ? "Great job! Take a longer break."
+            : "Nice work! Time for a short break."
+        );
+
+        return nextSessions;
+      });
+
+      return;
     }
+
+    setActiveMode("work");
+    setTimeLeft(TIMER_MODES.work.minutes * 60);
+    setStatusMessage("Break finished. Ready for another focus session.");
   }, [timeLeft, activeMode]);
 
   const formatTime = (seconds) => {
@@ -68,6 +93,7 @@ function App() {
     setActiveMode(mode);
     setIsRunning(false);
     setTimeLeft(TIMER_MODES[mode].minutes * 60);
+    setStatusMessage(`${TIMER_MODES[mode].label} mode selected.`);
     sessionCountedRef.current = false;
   };
 
@@ -78,16 +104,19 @@ function App() {
     }
 
     setIsRunning((prev) => !prev);
+    setStatusMessage(isRunning ? "Timer paused." : "Timer is running.");
   };
 
   const handleReset = () => {
     setIsRunning(false);
     setTimeLeft(currentMode.minutes * 60);
+    setStatusMessage("Timer reset.");
     sessionCountedRef.current = false;
   };
 
   const handleResetSessions = () => {
     setCompletedSessions(0);
+    setStatusMessage("Completed sessions cleared.");
   };
 
   return (
@@ -108,6 +137,7 @@ function App() {
         </div>
 
         <h1>{currentMode.title}</h1>
+        <p className="status-message">{statusMessage}</p>
 
         <div className="timer-display">{formatTime(timeLeft)}</div>
 
