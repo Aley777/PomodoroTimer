@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const TIMER_MODES = {
@@ -25,6 +25,8 @@ function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [completedSessions, setCompletedSessions] = useState(0);
 
+  const sessionCountedRef = useRef(false);
+
   const currentMode = TIMER_MODES[activeMode];
 
   useEffect(() => {
@@ -34,11 +36,6 @@ function App() {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           setIsRunning(false);
-
-          if (activeMode === "work") {
-            setCompletedSessions((prevSessions) => prevSessions + 1);
-          }
-
           return 0;
         }
 
@@ -47,7 +44,14 @@ function App() {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [isRunning, activeMode]);
+  }, [isRunning]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && activeMode === "work" && !sessionCountedRef.current) {
+      setCompletedSessions((prevSessions) => prevSessions + 1);
+      sessionCountedRef.current = true;
+    }
+  }, [timeLeft, activeMode]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -62,11 +66,13 @@ function App() {
     setActiveMode(mode);
     setIsRunning(false);
     setTimeLeft(TIMER_MODES[mode].minutes * 60);
+    sessionCountedRef.current = false;
   };
 
   const handleStartPause = () => {
     if (timeLeft === 0) {
       setTimeLeft(currentMode.minutes * 60);
+      sessionCountedRef.current = false;
     }
 
     setIsRunning((prev) => !prev);
@@ -75,6 +81,7 @@ function App() {
   const handleReset = () => {
     setIsRunning(false);
     setTimeLeft(currentMode.minutes * 60);
+    sessionCountedRef.current = false;
   };
 
   const handleResetSessions = () => {
