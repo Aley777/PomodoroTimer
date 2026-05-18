@@ -28,6 +28,8 @@ function App() {
   const sessionCountedRef = useRef(false);
 
   const currentMode = TIMER_MODES[activeMode];
+  const totalTime = currentMode.minutes * 60;
+  const progressPercentage = ((totalTime - timeLeft) / totalTime) * 100;
 
   useEffect(() => {
     if (!isRunning) return;
@@ -108,6 +110,20 @@ function App() {
         <h1>{currentMode.title}</h1>
 
         <div className="timer-display">{formatTime(timeLeft)}</div>
+
+        <div className="progress-wrapper">
+          <div className="progress-info">
+            <span>Progress</span>
+            <span>{Math.round(progressPercentage)}%</span>
+          </div>
+
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+        </div>
 
         <div className="button-group">
           <button onClick={handleStartPause} className="primary-button">
