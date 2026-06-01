@@ -172,35 +172,72 @@ function App() {
         <h1>{currentMode.title}</h1>
         <p className="status-message">{statusMessage}</p>
 
-        <div className="timer-display">{formatTime(timeLeft)}</div>
+<div className="timer-ring">
+  <svg className="progress-ring" width="320" height="320">
+    <circle
+      className="progress-ring-bg"
+      strokeWidth="10"
+      fill="transparent"
+      r="140"
+      cx="160"
+      cy="160"
+    />
 
-        <div className="progress-wrapper">
-          <div className="progress-info">
-            <span>Progress</span>
-            <span>{Math.round(progressPercentage)}%</span>
-          </div>
+    <circle
+      className="progress-ring-fill"
+      strokeWidth="10"
+      fill="transparent"
+      r="140"
+      cx="160"
+      cy="160"
+      strokeDasharray={879.2}
+      strokeDashoffset={
+        879.2 - (progressPercentage / 100) * 879.2
+      }
+    />
+  </svg>
 
-          <div className="progress-bar">
-            <div
-              className="progress-fill"
-              style={{ width: `${progressPercentage}%` }}
-            ></div>
-          </div>
-        </div>
+  <div className="timer-content">
+    <div className="timer-display">
+      {formatTime(timeLeft)}
+    </div>
+
+    <span className="timer-mode-label">
+      {currentMode.label}
+    </span>
+  </div>
+</div>
 
         <div className="button-group">
-          <button onClick={handleStartPause} className="primary-button">
-            {isRunning
-              ? "Pause"
-              : timeLeft === currentMode.minutes * 60
-              ? "Start"
-              : "Resume"}
-          </button>
+  <button onClick={handleStartPause} className="primary-button">
+    {isRunning
+      ? "Pause"
+      : timeLeft === currentMode.minutes * 60
+      ? "Start"
+      : "Resume"}
+  </button>
 
-          <button onClick={handleReset} className="secondary-button">
-            Reset
-          </button>
-        </div>
+  <button onClick={handleReset} className="secondary-button">
+    Reset
+  </button>
+</div>
+
+<div className="mini-stats">
+  <div className="mini-stat-card">
+    <span>Mode</span>
+    <strong>{currentMode.label}</strong>
+  </div>
+
+  <div className="mini-stat-card">
+    <span>Progress</span>
+    <strong>{Math.round(progressPercentage)}%</strong>
+  </div>
+
+  <div className="mini-stat-card">
+    <span>Goal</span>
+    <strong>{dailyGoal}</strong>
+  </div>
+</div>
 
         <div className="stats-container">
   <div className="goal-panel">
