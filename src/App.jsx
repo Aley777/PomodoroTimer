@@ -5,17 +5,17 @@ const TIMER_MODES = {
   work: {
     label: "Work",
     title: "Focus Session",
-    minutes: 0.1,
+    minutes: 25,
   },
   shortBreak: {
     label: "Short Break",
     title: "Quick Break",
-    minutes: 0.05,
+    minutes: 5,
   },
   longBreak: {
     label: "Long Break",
     title: "Deep Rest",
-    minutes: 0.05,
+    minutes: 15,
   },
 };
 
@@ -23,7 +23,11 @@ function App() {
   const [activeMode, setActiveMode] = useState("work");
   const [timeLeft, setTimeLeft] = useState(TIMER_MODES.work.minutes * 60);
   const [isRunning, setIsRunning] = useState(false);
-  const [completedSessions, setCompletedSessions] = useState(0);
+  const [completedSessions, setCompletedSessions] = useState(() => {
+  const savedSessions = localStorage.getItem("completedSessions");
+    return savedSessions ? Number(savedSessions) : 0;
+    });
+
   const [statusMessage, setStatusMessage] = useState(
     "Ready to start your focus session."
   );
@@ -50,6 +54,10 @@ function App() {
 
     return () => clearInterval(intervalId);
   }, [isRunning]);
+
+  useEffect(() => {
+    localStorage.setItem("completedSessions", completedSessions);
+  }, [completedSessions]);
 
   useEffect(() => {
     if (timeLeft !== 0 || sessionCountedRef.current) return;
@@ -116,6 +124,7 @@ function App() {
 
   const handleResetSessions = () => {
     setCompletedSessions(0);
+    localStorage.removeItem("completedSessions");
     setStatusMessage("Completed sessions cleared.");
   };
 
