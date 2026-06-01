@@ -202,50 +202,56 @@ function App() {
           </button>
         </div>
 
-        <div className="goal-panel">
-          <div className="goal-header">
-            <div>
-              <span className="goal-label">Daily Goal</span>
-              <strong>
-                {completedSessions} / {dailyGoal} Sessions
-              </strong>
-            </div>
+        <div className="stats-container">
+  <div className="goal-panel">
+    <div className="goal-top">
+      <div>
+        <p className="card-label">Daily Goal</p>
 
-            <div className="goal-actions">
-              <button onClick={decreaseGoal} className="goal-button">
-                -
-              </button>
+        <h3>
+          {completedSessions} / {dailyGoal}
+          <span> Sessions</span>
+        </h3>
+      </div>
 
-              <button onClick={increaseGoal} className="goal-button">
-                +
-              </button>
-            </div>
-          </div>
+      <div className="goal-actions">
+        <button onClick={decreaseGoal} className="goal-button">
+          −
+        </button>
 
-          <div className="goal-progress-bar">
-            <div
-              className="goal-progress-fill"
-              style={{ width: `${goalProgress}%` }}
-            ></div>
-          </div>
+        <button onClick={increaseGoal} className="goal-button">
+          +
+        </button>
+      </div>
+    </div>
 
-          {completedSessions >= dailyGoal && (
-            <p className="goal-complete-message">
-              Daily goal completed 🎉
-            </p>
-          )}
-        </div>
+    <div className="goal-progress-bar">
+      <div
+        className="goal-progress-fill"
+        style={{ width: `${goalProgress}%` }}
+      ></div>
+    </div>
 
-        <div className="session-panel">
-          <div>
-            <span className="session-label">Completed Sessions</span>
-            <strong>{completedSessions}</strong>
-          </div>
+    <p className="goal-helper-text">
+      {completedSessions >= dailyGoal
+        ? "Daily goal completed 🎉"
+        : `Complete ${
+            dailyGoal - completedSessions
+          } more session(s) to reach your goal.`}
+    </p>
+  </div>
 
-          <button onClick={handleResetSessions} className="ghost-button">
-            Clear
-          </button>
-        </div>
+  <div className="session-panel">
+    <div>
+      <p className="card-label">Completed Sessions</p>
+      <h2>{completedSessions}</h2>
+    </div>
+
+    <button onClick={handleResetSessions} className="ghost-button">
+      Clear
+    </button>
+  </div>
+</div>
       </section>
     </main>
   );

@@ -7,8 +7,9 @@ body {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   background:
-    radial-gradient(circle at top, rgba(248, 113, 113, 0.22), transparent 34%),
-    #111827;
+    radial-gradient(circle at top, rgba(244, 63, 94, 0.18), transparent 30%),
+    radial-gradient(circle at bottom, rgba(59, 130, 246, 0.15), transparent 35%),
+    #020617;
   color: #f9fafb;
 }
 
@@ -86,10 +87,13 @@ h1 {
 
 .timer-display {
   margin: 30px 0 24px;
-  font-size: clamp(64px, 16vw, 96px);
+  font-size: clamp(72px, 18vw, 120px);
   font-weight: 800;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.08em;
   line-height: 1;
+  background: linear-gradient(180deg, #ffffff, #d1d5db);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .progress-wrapper {
@@ -118,7 +122,8 @@ h1 {
   height: 100%;
   width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, #fb7185, #f87171);
+  background: linear-gradient(90deg, #fb7185, #f43f5e);
+  box-shadow: 0 0 18px rgba(244, 63, 94, 0.45);
   transition: width 0.4s ease;
 }
 
@@ -160,6 +165,120 @@ h1 {
   color: #f9fafb;
 }
 
+.stats-container {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.goal-panel,
+.session-panel {
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(17, 24, 39, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+.goal-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.card-label {
+  margin: 0 0 6px;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.goal-panel h3,
+.session-panel h2 {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.goal-panel h3 span {
+  font-size: 18px;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.goal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.goal-button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 14px;
+  background: #374151;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.goal-button:hover {
+  transform: translateY(-2px);
+  background: #4b5563;
+}
+
+.goal-progress-bar {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #111827;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #34d399, #10b981);
+  transition: width 0.4s ease;
+}
+
+.goal-helper-text {
+  margin: 14px 0 0;
+  color: #9ca3af;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.session-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.session-panel h2 {
+  font-size: 52px;
+}
+
+.ghost-button {
+  padding: 12px 20px;
+  border-radius: 16px;
+  background: transparent;
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ghost-button:hover {
+  transform: translateY(-2px);
+  background: rgba(248, 113, 113, 0.08);
+}
+
 .session-panel {
   margin-top: 28px;
   padding: 18px;
@@ -197,9 +316,18 @@ h1 {
 
 @media (max-width: 420px) {
   .timer-card {
-    padding: 28px 20px;
-  }
-
+  width: 100%;
+  max-width: 520px;
+  padding: 36px 32px;
+  border-radius: 34px;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
   .mode-tab {
     font-size: 12px;
   }
