@@ -24,19 +24,29 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(TIMER_MODES.work.minutes * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [completedSessions, setCompletedSessions] = useState(() => {
-  const savedSessions = localStorage.getItem("completedSessions");
-    return savedSessions ? Number(savedSessions) : 0;
+    const savedSessions = localStorage.getItem("completedSessions");
+      return savedSessions ? Number(savedSessions) : 0;
+      });
+
+  const [dailyGoal, setDailyGoal] = useState(() => {
+    const savedGoal = localStorage.getItem("dailyGoal");
+      return savedGoal ? Number(savedGoal) : 4;
     });
 
   const [statusMessage, setStatusMessage] = useState(
     "Ready to start your focus session."
-  );
+    );
 
   const sessionCountedRef = useRef(false);
 
   const currentMode = TIMER_MODES[activeMode];
   const totalTime = currentMode.minutes * 60;
   const progressPercentage = ((totalTime - timeLeft) / totalTime) * 100;
+
+  const goalProgress = Math.min(
+    (completedSessions / dailyGoal) * 100,
+    100
+  );
 
   useEffect(() => {
     if (!isRunning) return;
@@ -58,6 +68,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem("completedSessions", completedSessions);
   }, [completedSessions]);
+
+  useEffect(() => {
+    localStorage.setItem("dailyGoal", dailyGoal);
+  }, [dailyGoal]);
 
   useEffect(() => {
     if (timeLeft !== 0 || sessionCountedRef.current) return;
@@ -128,6 +142,16 @@ function App() {
     setStatusMessage("Completed sessions cleared.");
   };
 
+  const increaseGoal = () => {
+    setDailyGoal((prev) => prev + 1);
+  };
+
+  const decreaseGoal = () => {
+    if (dailyGoal <= 1) return;
+
+    setDailyGoal((prev) => prev - 1);
+  };
+
   return (
     <main className="app">
       <section className="timer-card">
@@ -176,6 +200,40 @@ function App() {
           <button onClick={handleReset} className="secondary-button">
             Reset
           </button>
+        </div>
+
+        <div className="goal-panel">
+          <div className="goal-header">
+            <div>
+              <span className="goal-label">Daily Goal</span>
+              <strong>
+                {completedSessions} / {dailyGoal} Sessions
+              </strong>
+            </div>
+
+            <div className="goal-actions">
+              <button onClick={decreaseGoal} className="goal-button">
+                -
+              </button>
+
+              <button onClick={increaseGoal} className="goal-button">
+                +
+              </button>
+            </div>
+          </div>
+
+          <div className="goal-progress-bar">
+            <div
+              className="goal-progress-fill"
+              style={{ width: `${goalProgress}%` }}
+            ></div>
+          </div>
+
+          {completedSessions >= dailyGoal && (
+            <p className="goal-complete-message">
+              Daily goal completed 🎉
+            </p>
+          )}
         </div>
 
         <div className="session-panel">
