@@ -173,29 +173,29 @@ function App() {
         <p className="status-message">{statusMessage}</p>
 
 <div className="timer-ring">
-  <svg className="progress-ring" width="320" height="320">
-    <circle
-      className="progress-ring-bg"
-      strokeWidth="10"
-      fill="transparent"
-      r="140"
-      cx="160"
-      cy="160"
-    />
+  <svg className="progress-ring" viewBox="0 0 340 340">
+  <circle
+    className="progress-ring-bg"
+    strokeWidth="8"
+    fill="transparent"
+    r="150"
+    cx="170"
+    cy="170"
+  />
 
-    <circle
-      className="progress-ring-fill"
-      strokeWidth="10"
-      fill="transparent"
-      r="140"
-      cx="160"
-      cy="160"
-      strokeDasharray={879.2}
-      strokeDashoffset={
-        879.2 - (progressPercentage / 100) * 879.2
-      }
-    />
-  </svg>
+  <circle
+    className="progress-ring-fill"
+    strokeWidth="8"
+    fill="transparent"
+    r="150"
+    cx="170"
+    cy="170"
+    strokeDasharray={942}
+    strokeDashoffset={
+      942 - (progressPercentage / 100) * 942
+    }
+  />
+</svg>
 
   <div className="timer-content">
     <div className="timer-display">
