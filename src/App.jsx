@@ -1,25 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
-
-const TIMER_MODES = {
-  work: {
-    label: "Work",
-    title: "Focus Session",
-    minutes: 25,
-  },
-  shortBreak: {
-    label: "Short Break",
-    title: "Quick Break",
-    minutes: 5,
-  },
-  longBreak: {
-    label: "Long Break",
-    title: "Deep Rest",
-    minutes: 15,
-  },
-};
-
-const DEFAULT_TIMER_MODES = TIMER_MODES;
+import DEFAULT_TIMER_MODES from "./constants/timerModes";
+import {
+  formatTime,
+  calculateProgress,
+  calculateGoalProgress,
+} from "./utils/timerUtils";
+import useAlarm from "./hooks/useAlarm";
+import useTimer from "./hooks/useTimer";
+import TimerRing from "./components/TimerRing";
+import MiniStats from "./components/MiniStats";
+import StatsPanel from "./components/StatsPanel";
+import SettingsModal from "./components/SettingsModal";
 
 function App() {
   const [timerModes, setTimerModes] = useState(() => {
@@ -30,15 +22,24 @@ function App() {
     : DEFAULT_TIMER_MODES;
 });
 
-  const [activeMode, setActiveMode] = useState("work");
-const [timeLeft, setTimeLeft] = useState(
-  timerModes.work.minutes * 60
-);
-  const [isRunning, setIsRunning] = useState(false);
+  const {
+  activeMode,
+  setActiveMode,
+  timeLeft,
+  setTimeLeft,
+  isRunning,
+  setIsRunning,
+} = useTimer(timerModes);
+
   const [completedSessions, setCompletedSessions] = useState(() => {
     const savedSessions = localStorage.getItem("completedSessions");
       return savedSessions ? Number(savedSessions) : 0;
       });
+
+  const [sessionHistory, setSessionHistory] = useState(() => {
+  const saved = localStorage.getItem("sessionHistory");
+  return saved ? JSON.parse(saved) : [];
+});
 
   const [dailyGoal, setDailyGoal] = useState(() => {
     const savedGoal = localStorage.getItem("dailyGoal");
@@ -63,14 +64,22 @@ const [longBreakMinutes, setLongBreakMinutes] = useState(
 
   const sessionCountedRef = useRef(false);
 
+  const {
+  playWorkAlarm,
+  playBreakAlarm,
+} = useAlarm();
+
   const currentMode = timerModes[activeMode];
   const totalTime = currentMode.minutes * 60;
-  const progressPercentage = ((totalTime - timeLeft) / totalTime) * 100;
+const progressPercentage = calculateProgress(
+  timeLeft,
+  totalTime
+);
 
-  const goalProgress = Math.min(
-    (completedSessions / dailyGoal) * 100,
-    100
-  );
+  const goalProgress = calculateGoalProgress(
+  completedSessions,
+  dailyGoal
+);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -107,6 +116,21 @@ const [longBreakMinutes, setLongBreakMinutes] = useState(
   useEffect(() => {
     if (timeLeft !== 0 || sessionCountedRef.current) return;
 
+  useEffect(() => {
+  localStorage.setItem(
+    "sessionHistory",
+    JSON.stringify(sessionHistory)
+  );
+}, [sessionHistory]);
+
+    if (activeMode === "work") {
+  playWorkAlarm();
+} else {
+  playBreakAlarm();
+}
+
+addSessionHistory(currentMode.label);
+
     sessionCountedRef.current = true;
 
     if (activeMode === "work") {
@@ -122,6 +146,8 @@ setTimeLeft(timerModes[nextMode].minutes * 60);
             : "Nice work! Time for a short break."
         );
 
+        sessionCountedRef.current = false;
+
         return nextSessions;
       });
 
@@ -131,22 +157,16 @@ setTimeLeft(timerModes[nextMode].minutes * 60);
     setActiveMode("work");
 setTimeLeft(timerModes.work.minutes * 60);
     setStatusMessage("Break finished. Ready for another focus session.");
+
+    sessionCountedRef.current = false;
+
   }, [timeLeft, activeMode]);
-
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-
-    return `${String(minutes).padStart(2, "0")}:${String(
-      remainingSeconds
-    ).padStart(2, "0")}`;
-  };
 
   const handleModeChange = (mode) => {
     setActiveMode(mode);
     setIsRunning(false);
 setTimeLeft(timerModes[mode].minutes * 60);
-    setStatusMessage(`${TIMER_MODES[mode].label} mode selected.`);
+setStatusMessage(`${timerModes[mode].label} mode selected.`);
     sessionCountedRef.current = false;
   };
 
@@ -204,6 +224,23 @@ setTimeLeft(timerModes[mode].minutes * 60);
     setStatusMessage("Completed sessions cleared.");
   };
 
+  const addSessionHistory = (type) => {
+  const newSession = {
+    id: Date.now(),
+    type,
+    time: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    date: new Date().toLocaleDateString(),
+  };
+
+  setSessionHistory((prev) => [
+    newSession,
+    ...prev.slice(0, 9),
+  ]);
+};
+
   const openSettings = () => {
   setWorkMinutes(timerModes.work.minutes);
   setShortBreakMinutes(timerModes.shortBreak.minutes);
@@ -241,7 +278,7 @@ const closeSettings = () => {
 </div>
 
         <div className="mode-tabs">
-          {Object.entries(TIMER_MODES).map(([mode, data]) => (
+          {Object.entries(timerModes).map(([mode, data]) => (
             <button
               key={mode}
               onClick={() => handleModeChange(mode)}
@@ -255,41 +292,11 @@ const closeSettings = () => {
         <h1>{currentMode.title}</h1>
         <p className="status-message">{statusMessage}</p>
 
-<div className="timer-ring">
-  <svg className="progress-ring" viewBox="0 0 340 340">
-  <circle
-    className="progress-ring-bg"
-    strokeWidth="8"
-    fill="transparent"
-    r="150"
-    cx="170"
-    cy="170"
-  />
-
-  <circle
-    className="progress-ring-fill"
-    strokeWidth="8"
-    fill="transparent"
-    r="150"
-    cx="170"
-    cy="170"
-    strokeDasharray={942}
-    strokeDashoffset={
-      942 - (progressPercentage / 100) * 942
-    }
-  />
-</svg>
-
-  <div className="timer-content">
-    <div className="timer-display">
-      {formatTime(timeLeft)}
-    </div>
-
-    <span className="timer-mode-label">
-      {currentMode.label}
-    </span>
-  </div>
-</div>
+        <TimerRing
+  time={formatTime(timeLeft)}
+  mode={currentMode.label}
+  progressPercentage={progressPercentage}
+/>
 
         <div className="button-group">
   <button onClick={handleStartPause} className="primary-button">
@@ -305,151 +312,32 @@ const closeSettings = () => {
   </button>
 </div>
 
-<div className="mini-stats">
-  <div className="mini-stat-card">
-    <span>Mode</span>
-    <strong>{currentMode.label}</strong>
-  </div>
+<MiniStats
+  currentMode={currentMode.label}
+  progressPercentage={progressPercentage}
+  dailyGoal={dailyGoal}
+/>
 
-  <div className="mini-stat-card">
-    <span>Progress</span>
-    <strong>{Math.round(progressPercentage)}%</strong>
-  </div>
-
-  <div className="mini-stat-card">
-    <span>Goal</span>
-    <strong>{dailyGoal}</strong>
-  </div>
-</div>
-
-        <div className="stats-container">
-  <div className="goal-panel">
-    <div className="goal-top">
-      <div>
-        <p className="card-label">Daily Goal</p>
-
-        <h3>
-          {completedSessions} / {dailyGoal}
-          <span> Sessions</span>
-        </h3>
-      </div>
-
-      <div className="goal-actions">
-        <button onClick={decreaseGoal} className="goal-button">
-          −
-        </button>
-
-        <button onClick={increaseGoal} className="goal-button">
-          +
-        </button>
-      </div>
-    </div>
-
-    <div className="goal-progress-bar">
-      <div
-        className="goal-progress-fill"
-        style={{ width: `${goalProgress}%` }}
-      ></div>
-    </div>
-
-    <p className="goal-helper-text">
-      {completedSessions >= dailyGoal
-        ? "Daily goal completed 🎉"
-        : `Complete ${
-            dailyGoal - completedSessions
-          } more session(s) to reach your goal.`}
-    </p>
-  </div>
-
-  <div className="session-panel">
-    <div>
-      <p className="card-label">Completed Sessions</p>
-      <h2>{completedSessions}</h2>
-    </div>
-
-    <button onClick={handleResetSessions} className="ghost-button">
-      Clear
-    </button>
-  </div>
-</div>
+        <StatsPanel
+  completedSessions={completedSessions}
+  dailyGoal={dailyGoal}
+  goalProgress={goalProgress}
+  increaseGoal={increaseGoal}
+  decreaseGoal={decreaseGoal}
+  handleResetSessions={handleResetSessions}
+/>
 
 {isSettingsOpen && (
-  <div className="modal-overlay" onClick={closeSettings}>
-    <div
-      className="settings-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <h2>Settings</h2>
-
-      <div className="settings-form">
-
-  <label>
-    Work Session (minutes)
-
-    <input
-      type="number"
-      min="1"
-      max="120"
-      value={workMinutes}
-      onChange={(e) =>
-  setWorkMinutes(
-    Math.min(
-      120,
-      Math.max(1, Number(e.target.value))
-    )
-  )
-}
-    />
-  </label>
-
-  <label>
-    Short Break
-
-    <input
-      type="number"
-      min="1"
-      max="60"
-      value={shortBreakMinutes}
-      onChange={(e) =>
-  setShortBreakMinutes(
-    Math.min(
-      60,
-      Math.max(1, Number(e.target.value))
-    )
-  )
-}
-    />
-  </label>
-
-  <label>
-    Long Break
-
-    <input
-      type="number"
-      min="1"
-      max="120"
-      value={longBreakMinutes}
-      onChange={(e) =>
-  setLongBreakMinutes(
-    Math.min(
-      120,
-      Math.max(1, Number(e.target.value))
-    )
-  )
-}
-    />
-  </label>
-
-  <button
-  className="primary-button"
-  onClick={handleSaveSettings}
->
-  Save
-</button>
-
-</div>
-    </div>
-  </div>
+  <SettingsModal
+    workMinutes={workMinutes}
+    shortBreakMinutes={shortBreakMinutes}
+    longBreakMinutes={longBreakMinutes}
+    setWorkMinutes={setWorkMinutes}
+    setShortBreakMinutes={setShortBreakMinutes}
+    setLongBreakMinutes={setLongBreakMinutes}
+    handleSaveSettings={handleSaveSettings}
+    closeSettings={closeSettings}
+  />
 )}
 
       </section>
