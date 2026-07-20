@@ -19,9 +19,21 @@ const TIMER_MODES = {
   },
 };
 
+const DEFAULT_TIMER_MODES = TIMER_MODES;
+
 function App() {
+  const [timerModes, setTimerModes] = useState(() => {
+  const saved = localStorage.getItem("timerModes");
+
+  return saved
+    ? JSON.parse(saved)
+    : DEFAULT_TIMER_MODES;
+});
+
   const [activeMode, setActiveMode] = useState("work");
-  const [timeLeft, setTimeLeft] = useState(TIMER_MODES.work.minutes * 60);
+const [timeLeft, setTimeLeft] = useState(
+  timerModes.work.minutes * 60
+);
   const [isRunning, setIsRunning] = useState(false);
   const [completedSessions, setCompletedSessions] = useState(() => {
     const savedSessions = localStorage.getItem("completedSessions");
@@ -33,13 +45,25 @@ function App() {
       return savedGoal ? Number(savedGoal) : 4;
     });
 
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const [workMinutes, setWorkMinutes] = useState(timerModes.work.minutes);
+
+const [shortBreakMinutes, setShortBreakMinutes] = useState(
+  timerModes.shortBreak.minutes
+);
+
+const [longBreakMinutes, setLongBreakMinutes] = useState(
+  timerModes.longBreak.minutes
+);
+
   const [statusMessage, setStatusMessage] = useState(
     "Ready to start your focus session."
     );
 
   const sessionCountedRef = useRef(false);
 
-  const currentMode = TIMER_MODES[activeMode];
+  const currentMode = timerModes[activeMode];
   const totalTime = currentMode.minutes * 60;
   const progressPercentage = ((totalTime - timeLeft) / totalTime) * 100;
 
@@ -74,6 +98,13 @@ function App() {
   }, [dailyGoal]);
 
   useEffect(() => {
+  localStorage.setItem(
+    "timerModes",
+    JSON.stringify(timerModes)
+  );
+}, [timerModes]);
+
+  useEffect(() => {
     if (timeLeft !== 0 || sessionCountedRef.current) return;
 
     sessionCountedRef.current = true;
@@ -84,7 +115,7 @@ function App() {
         const nextMode = nextSessions % 4 === 0 ? "longBreak" : "shortBreak";
 
         setActiveMode(nextMode);
-        setTimeLeft(TIMER_MODES[nextMode].minutes * 60);
+setTimeLeft(timerModes[nextMode].minutes * 60);
         setStatusMessage(
           nextMode === "longBreak"
             ? "Great job! Take a longer break."
@@ -98,7 +129,7 @@ function App() {
     }
 
     setActiveMode("work");
-    setTimeLeft(TIMER_MODES.work.minutes * 60);
+setTimeLeft(timerModes.work.minutes * 60);
     setStatusMessage("Break finished. Ready for another focus session.");
   }, [timeLeft, activeMode]);
 
@@ -114,7 +145,7 @@ function App() {
   const handleModeChange = (mode) => {
     setActiveMode(mode);
     setIsRunning(false);
-    setTimeLeft(TIMER_MODES[mode].minutes * 60);
+setTimeLeft(timerModes[mode].minutes * 60);
     setStatusMessage(`${TIMER_MODES[mode].label} mode selected.`);
     sessionCountedRef.current = false;
   };
@@ -136,11 +167,54 @@ function App() {
     sessionCountedRef.current = false;
   };
 
+  const handleSaveSettings = () => {
+  setTimerModes({
+    work: {
+      ...timerModes.work,
+      minutes: workMinutes,
+    },
+    shortBreak: {
+      ...timerModes.shortBreak,
+      minutes: shortBreakMinutes,
+    },
+    longBreak: {
+      ...timerModes.longBreak,
+      minutes: longBreakMinutes,
+    },
+  });
+
+  // Eğer timer çalışmıyorsa yeni sürenin hemen uygulanmasını sağla
+  if (!isRunning) {
+    setTimeLeft(
+      activeMode === "work"
+        ? workMinutes * 60
+        : activeMode === "shortBreak"
+        ? shortBreakMinutes * 60
+        : longBreakMinutes * 60
+    );
+  }
+
+  setStatusMessage("Settings saved successfully.");
+  closeSettings();
+};
+
   const handleResetSessions = () => {
     setCompletedSessions(0);
     localStorage.removeItem("completedSessions");
     setStatusMessage("Completed sessions cleared.");
   };
+
+  const openSettings = () => {
+  setWorkMinutes(timerModes.work.minutes);
+  setShortBreakMinutes(timerModes.shortBreak.minutes);
+  setLongBreakMinutes(timerModes.longBreak.minutes);
+
+  setIsSettingsOpen(true);
+};
+
+const closeSettings = () => {
+  setIsSettingsOpen(false);
+};
 
   const increaseGoal = () => {
     setDailyGoal((prev) => prev + 1);
@@ -156,6 +230,15 @@ function App() {
     <main className="app">
       <section className="timer-card">
         <p className="eyebrow">Pomodoro Timer</p>
+
+        <div className="header-actions">
+  <button
+    className="settings-button"
+    onClick={openSettings}
+  >
+    ⚙ Settings
+  </button>
+</div>
 
         <div className="mode-tabs">
           {Object.entries(TIMER_MODES).map(([mode, data]) => (
@@ -289,6 +372,86 @@ function App() {
     </button>
   </div>
 </div>
+
+{isSettingsOpen && (
+  <div className="modal-overlay" onClick={closeSettings}>
+    <div
+      className="settings-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h2>Settings</h2>
+
+      <div className="settings-form">
+
+  <label>
+    Work Session (minutes)
+
+    <input
+      type="number"
+      min="1"
+      max="120"
+      value={workMinutes}
+      onChange={(e) =>
+  setWorkMinutes(
+    Math.min(
+      120,
+      Math.max(1, Number(e.target.value))
+    )
+  )
+}
+    />
+  </label>
+
+  <label>
+    Short Break
+
+    <input
+      type="number"
+      min="1"
+      max="60"
+      value={shortBreakMinutes}
+      onChange={(e) =>
+  setShortBreakMinutes(
+    Math.min(
+      60,
+      Math.max(1, Number(e.target.value))
+    )
+  )
+}
+    />
+  </label>
+
+  <label>
+    Long Break
+
+    <input
+      type="number"
+      min="1"
+      max="120"
+      value={longBreakMinutes}
+      onChange={(e) =>
+  setLongBreakMinutes(
+    Math.min(
+      120,
+      Math.max(1, Number(e.target.value))
+    )
+  )
+}
+    />
+  </label>
+
+  <button
+  className="primary-button"
+  onClick={handleSaveSettings}
+>
+  Save
+</button>
+
+</div>
+    </div>
+  </div>
+)}
+
       </section>
     </main>
   );

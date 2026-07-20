@@ -375,3 +375,100 @@ h1 {
     text-align: center;
   }
 }
+
+.header-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.settings-button {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.1);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.settings-button:hover {
+  background: rgba(255,255,255,.08);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(5px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+}
+
+.settings-modal {
+  width: 90%;
+  max-width: 420px;
+
+  background: #111827;
+  border-radius: 24px;
+
+  padding: 30px;
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  animation: popup .25s ease;
+}
+
+.settings-modal h2 {
+  margin-top: 0;
+}
+
+.settings-modal p {
+  color: #94a3b8;
+  margin-bottom: 24px;
+}
+
+@keyframes popup {
+  from {
+    opacity: 0;
+    transform: scale(.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settings-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.settings-form input {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.settings-form input:focus {
+  border-color: #fb7185;
+}
