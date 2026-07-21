@@ -8,10 +8,6 @@ A modern and customizable Pomodoro Timer built with **React** and **Vite** to im
 
 ## 📸 Preview
 
-> Add a screenshot of the application here.
-
-Example:
-
 (![Pomodoro Timer](image.png)(![cont](image-2.png)))
 
 ---
