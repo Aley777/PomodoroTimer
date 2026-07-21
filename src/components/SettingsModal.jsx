@@ -7,6 +7,8 @@ function SettingsModal({
   setLongBreakMinutes,
   handleSaveSettings,
   closeSettings,
+  soundEnabled,
+setSoundEnabled,
 }) {
   return (
     <div className="modal-overlay">
@@ -80,6 +82,21 @@ function SettingsModal({
               }
             />
           </label>
+
+          <div className="setting-row">
+  <span>Enable Sound</span>
+
+  <button
+    className={`toggle-button ${
+      soundEnabled ? "active" : ""
+    }`}
+    onClick={() =>
+      setSoundEnabled(!soundEnabled)
+    }
+  >
+    {soundEnabled ? "ON" : "OFF"}
+  </button>
+</div>
 
           <button
             className="primary-button"

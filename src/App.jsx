@@ -12,6 +12,7 @@ import TimerRing from "./components/TimerRing";
 import MiniStats from "./components/MiniStats";
 import StatsPanel from "./components/StatsPanel";
 import SettingsModal from "./components/SettingsModal";
+import SessionHistory from "./components/SessionHistory";
 
 function App() {
   const [timerModes, setTimerModes] = useState(() => {
@@ -64,10 +65,15 @@ const [longBreakMinutes, setLongBreakMinutes] = useState(
 
   const sessionCountedRef = useRef(false);
 
-  const {
+const [soundEnabled, setSoundEnabled] = useState(() => {
+  const saved = localStorage.getItem("soundEnabled");
+  return saved ? JSON.parse(saved) : true;
+});
+
+const {
   playWorkAlarm,
   playBreakAlarm,
-} = useAlarm();
+} = useAlarm(soundEnabled);
 
   const currentMode = timerModes[activeMode];
   const totalTime = currentMode.minutes * 60;
@@ -113,16 +119,22 @@ const progressPercentage = calculateProgress(
   );
 }, [timerModes]);
 
-  useEffect(() => {
-    if (timeLeft !== 0 || sessionCountedRef.current) return;
-
-  useEffect(() => {
+useEffect(() => {
   localStorage.setItem(
     "sessionHistory",
     JSON.stringify(sessionHistory)
   );
 }, [sessionHistory]);
 
+useEffect(() => {
+  localStorage.setItem(
+    "soundEnabled",
+    JSON.stringify(soundEnabled)
+  );
+}, [soundEnabled]);
+
+  useEffect(() => {
+    if (timeLeft !== 0 || sessionCountedRef.current) return;
     if (activeMode === "work") {
   playWorkAlarm();
 } else {
@@ -160,7 +172,14 @@ setTimeLeft(timerModes.work.minutes * 60);
 
     sessionCountedRef.current = false;
 
-  }, [timeLeft, activeMode]);
+  }, [
+  timeLeft,
+  activeMode,
+  currentMode,
+  timerModes,
+  playWorkAlarm,
+  playBreakAlarm,
+]);
 
   const handleModeChange = (mode) => {
     setActiveMode(mode);
@@ -228,11 +247,13 @@ setStatusMessage(`${timerModes[mode].label} mode selected.`);
   const newSession = {
     id: Date.now(),
     type,
-    time: new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    date: new Date().toLocaleDateString(),
+    completedAt: new Date().toLocaleString([], {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+}),
   };
 
   setSessionHistory((prev) => [
@@ -327,6 +348,10 @@ const closeSettings = () => {
   handleResetSessions={handleResetSessions}
 />
 
+<SessionHistory
+    sessionHistory={sessionHistory}
+/>
+
 {isSettingsOpen && (
   <SettingsModal
     workMinutes={workMinutes}
@@ -337,6 +362,8 @@ const closeSettings = () => {
     setLongBreakMinutes={setLongBreakMinutes}
     handleSaveSettings={handleSaveSettings}
     closeSettings={closeSettings}
+    soundEnabled={soundEnabled}
+setSoundEnabled={setSoundEnabled}
   />
 )}
 

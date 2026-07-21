@@ -39,9 +39,9 @@ function TimerRing({
           {time}
         </div>
 
-        <span className="timer-mode-label">
+        <div className="timer-mode-label">
           {mode}
-        </span>
+        </div>
       </div>
     </div>
   );
