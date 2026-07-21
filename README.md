@@ -12,7 +12,7 @@ A modern and customizable Pomodoro Timer built with **React** and **Vite** to im
 
 Example:
 
-(![Pomodoro Timer](image.png)(image-1.png))
+(![Pomodoro Timer](image.png)(![cont](image-2.png)))
 
 ---
 
