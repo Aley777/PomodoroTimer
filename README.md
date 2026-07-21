@@ -1,16 +1,123 @@
-# React + Vite
+# 🍅 Pomodoro Timer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern and customizable Pomodoro Timer built with **React** and **Vite** to improve focus and productivity.
 
-Currently, two official plugins are available:
+🔗 **Live Demo:** https://pomodoro-timer-psi-puce.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 📸 Preview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+> Add a screenshot of the application here.
 
-## Expanding the ESLint configuration
+Example:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+(![Pomodoro Timer](image.png)(image-1.png))
+
+---
+
+## ✨ Features
+
+- ⏱️ 25/5/15 Pomodoro workflow
+- 🎯 Daily goal tracking
+- 📊 Circular progress indicator
+- 📈 Session progress
+- 📚 Session history
+- 🔔 Sound notifications
+- 🔇 Enable / Disable alarm sounds
+- ⚙️ Custom work & break durations
+- 💾 Persistent settings with Local Storage
+- 📱 Responsive design
+- 🎨 Modern UI
+
+---
+
+## 🛠️ Built With
+
+- React
+- Vite
+- JavaScript (ES6+)
+- CSS3
+- React Hooks
+- Local Storage API
+
+---
+
+## 🚀 Getting Started
+
+Clone the repository
+
+```bash
+git clone https://github.com/Aley777/PomodoroTimer.git
+```
+
+Go to the project folder
+
+```bash
+cd PomodoroTimer
+```
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Run the development server
+
+```bash
+npm run dev
+```
+
+Build for production
+
+```bash
+npm run build
+```
+
+---
+
+## 📂 Project Structure
+
+```
+src/
+│
+├── assets/
+├── components/
+│   ├── MiniStats.jsx
+│   ├── SessionHistory.jsx
+│   ├── SettingsModal.jsx
+│   ├── StatsPanel.jsx
+│   └── TimerRing.jsx
+│
+├── constants/
+│   └── timerModes.js
+│
+├── hooks/
+│   ├── useAlarm.js
+│   └── useTimer.js
+│
+├── utils/
+│   └── timerUtils.js
+│
+├── App.jsx
+└── App.css
+```
+
+---
+
+## 🎯 Future Improvements
+
+- Dark / Light theme
+- Keyboard shortcuts
+- Statistics dashboard
+- Weekly productivity report
+- Multiple alarm sounds
+
+---
+
+## 👩‍💻 Author
+
+**Aleyna Aydoğdu**
+
+GitHub: https://github.com/Aley777
